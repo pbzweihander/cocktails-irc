@@ -2,7 +2,6 @@
 from irc import *
 import requests
 import json
-import time
 
 channel = "#pbzweihander"
 server = "irc.uriirc.org"
@@ -15,14 +14,8 @@ irc = IRC()
 def main():
     global irc
 
-    while True:
-        try:
-            irc.init()
-            irc.connect(server, port, channel, nickname)
-            break
-        except:
-            print("retrying connection...")
-            time.sleep(1)
+    irc.init()
+    irc.connect(server, port, channel, nickname)
 
     while True:
         lines = irc.get_text()
@@ -54,7 +47,7 @@ def main():
                             irc.send(chan, s)
 
 
-def handle(msg):
+def handle(msg: str) -> tuple:
     if msg[:2] == 'c>':
         name = msg.split('>')[1].strip()
         if name:
@@ -62,12 +55,16 @@ def handle(msg):
                 return random_cocktails()
             else:
                 return find_cocktails(name)
-    return None
+    elif msg[:2] == 'i>':
+        name = msg.split('>')[1].strip()
+        if name:
+            return find_ingredient(name)
+    return ()
 
 
-def find_cocktails(name: str):
+def find_cocktails(name: str) -> tuple:
     dlist = get_drinklist(r"http://www.thecocktaildb.com/api/json/v1/1/search.php?s=" + name)
-    if dlist[0].get('strDrink').strip() == name:
+    if dlist[0].get('strDrink').strip().lower() == name.lower():
         return parse_cocktail(dlist[0])
     else:
         nlist = [d.get('strDrink') for d in dlist]
@@ -77,17 +74,17 @@ def find_cocktails(name: str):
             return ', '.join(nlist[:8]),
 
 
-def random_cocktails():
+def random_cocktails() -> tuple:
     dlist = get_drinklist(r"http://www.thecocktaildb.com/api/json/v1/1/random.php")
     d = dlist[0]
     return parse_cocktail(d)
 
 
-def parse_cocktail(d: dict):
+def parse_cocktail(d: dict) -> tuple:
     name = d.get('strDrink').strip()
     if not name:
-        return None
-    glass = d.get('strGlass').strip()
+        return ()
+    glass = (d.get('strGlass') or "").strip()
     ingredients = []
     measures = []
     for i in range(1, 16):
@@ -96,17 +93,61 @@ def parse_cocktail(d: dict):
         if len(ii) > 0 and len(mm) > 0:
             ingredients.append(ii)
             measures.append(mm)
-    instruction = d.get("strInstructions").strip()
-    s = name + '\nServe on : ' + glass + '\n'
+    instruction = (d.get("strInstructions") or "").strip()
+    s = name + '\n'
+    if glass:
+        s += 'Serve on : ' + glass + '\n'
     for i, m in zip(ingredients, measures):
         s += i + ' - ' + m + '\n'
     s += instruction
     return tuple(s.split('\n'))
 
 
-def get_drinklist(url: str):
+def get_drinklist(url: str) -> list:
     r = requests.get(url)
-    return list(json.loads(r.text).get('drinks'))
+    if len(r.text) > 0:
+        dl = json.loads(r.text).get('drinks')
+        if dl:
+            return list(dl)
+    return []
+
+
+def find_ingredient(name: str) -> tuple:
+    dlist = get_ingredientlist(r"http://www.thecocktaildb.com/api/json/v1/1/search.php?i=" + name)
+    if not dlist:
+        return ()
+    if dlist[0].get('strIngredient').strip().lower() == name.lower():
+        return parse_ingredient(dlist[0])
+    else:
+        nlist = [d.get('strIngredient') for d in dlist]
+        if len(nlist) < 8:
+            return ', '.join(nlist),
+        else:
+            return ', '.join(nlist[:8]),
+
+
+def parse_ingredient(d: dict) -> tuple:
+    print(d)
+    name = d.get('strIngredient').strip()
+    if not name:
+        return ()
+    stype = (d.get('strType') or "").strip()
+    description = (d.get("strDescription") or "").strip()
+    s = name + '\n'
+    if stype:
+        s += 'Type : ' + stype + '\n'
+    s += description
+    return tuple(s.split('\n'))
+
+
+def get_ingredientlist(url: str) -> list:
+    r = requests.get(url)
+    if len(r.text) > 0:
+        il = json.loads(r.text).get('ingredients')
+        if il:
+            return list(il)
+    return []
+
 
 if __name__ == '__main__':
     main()

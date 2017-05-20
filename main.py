@@ -64,6 +64,8 @@ def handle(msg: str) -> tuple:
 
 def find_cocktails(name: str) -> tuple:
     dlist = get_drinklist(r"http://www.thecocktaildb.com/api/json/v1/1/search.php?s=" + name)
+    if len(dlist) == 0:
+        return ""
     if dlist[0].get('strDrink').strip().lower() == name.lower():
         return parse_cocktail(dlist[0])
     else:
@@ -114,6 +116,8 @@ def get_drinklist(url: str) -> list:
 
 def find_ingredient(name: str) -> tuple:
     dlist = get_ingredientlist(r"http://www.thecocktaildb.com/api/json/v1/1/search.php?i=" + name)
+    if len(dlist) == 0:
+        return ""
     if not dlist:
         return ()
     if dlist[0].get('strIngredient').strip().lower() == name.lower():

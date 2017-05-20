@@ -91,11 +91,11 @@ def parse_ingredient(d: dict) -> str:
     if not name:
         return ""
     stype = (d.get('strType') or "").strip()
-    description = (d.get("strDescription") or "").strip()
+    # description = (d.get("strDescription") or "").strip()
     s = name + '\n'
     if stype:
-        s += 'Type : ' + stype + '\n'
-    s += description
+        s += 'Type : ' + stype  # + '\n'
+    # s += description
     return s
 
 

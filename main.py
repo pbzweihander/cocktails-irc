@@ -40,11 +40,13 @@ def main():
                 if "#" not in chan:  # 채널 메세지가 아니라 쿼리(귓속말)
                     chan = sender
 
-                ss = handle(msg)
+                ss, chk = handle(msg)
                 if ss:
                     for s in ss:
                         if s:
                             irc.send(chan, s)
+                elif not ss and chk:
+                    irc.send(chan, "._.")
 
 
 def handle(msg: str) -> tuple:
@@ -52,14 +54,14 @@ def handle(msg: str) -> tuple:
         name = msg.split('>')[1].strip()
         if name:
             if name == 'random':
-                return random_cocktails()
+                return random_cocktails(), True
             else:
-                return find_cocktails(name)
+                return find_cocktails(name), True
     elif msg[:2] == 'i>':
         name = msg.split('>')[1].strip()
         if name:
-            return find_ingredient(name)
-    return ()
+            return find_ingredient(name), True
+    return (), False
 
 
 def find_cocktails(name: str) -> tuple:

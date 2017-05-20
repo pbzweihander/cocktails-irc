@@ -46,8 +46,8 @@ def parse_cocktail(d: dict) -> str:
     ingredients = []
     measures = []
     for i in range(1, 16):
-        ii = d.get("strIngredient%s" % i).strip()
-        mm = d.get("strMeasure%s" % i).strip()
+        ii = (d.get("strIngredient%s" % i) or "").strip()
+        mm = (d.get("strMeasure%s" % i) or "").strip()
         if len(ii) > 0 and len(mm) > 0:
             ingredients.append(ii)
             measures.append(mm)

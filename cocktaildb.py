@@ -22,7 +22,7 @@ def find_cocktails(name: str) -> str:
     dlist = get_drinklist(r"http://www.thecocktaildb.com/api/json/v1/1/search.php?s=" + name)
     if len(dlist) == 0:
         return ""
-    if dlist[0].get('strDrink').strip().lower() == name.lower():
+    if dlist[0].get('strDrink').strip().lower() == name.lower() or len(dlist) == 1:
         return parse_cocktail(dlist[0])
     else:
         nlist = [d.get('strDrink') for d in dlist]
@@ -76,7 +76,7 @@ def find_ingredient(name: str) -> str:
         return ""
     if not dlist:
         return ""
-    if dlist[0].get('strIngredient').strip().lower() == name.lower():
+    if dlist[0].get('strIngredient').strip().lower() == name.lower() or len(dlist) == 1:
         return parse_ingredient(dlist[0])
     else:
         nlist = [d.get('strIngredient') for d in dlist]

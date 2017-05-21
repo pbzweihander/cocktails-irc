@@ -70,14 +70,14 @@ def get_drinklist(url: str) -> list:
     return []
 
 
-def find_ingredient(name: str) -> str:
+def find_ingredient(name: str, detailed=False) -> str:
     dlist = get_ingredientlist(r"http://www.thecocktaildb.com/api/json/v1/1/search.php?i=" + name)
     if len(dlist) == 0:
         return ""
     if not dlist:
         return ""
     if dlist[0].get('strIngredient').strip().lower() == name.lower() or len(dlist) == 1:
-        return parse_ingredient(dlist[0])
+        return parse_ingredient(dlist[0], detailed)
     else:
         nlist = [d.get('strIngredient') for d in dlist]
         if len(nlist) < 8:
@@ -86,16 +86,16 @@ def find_ingredient(name: str) -> str:
             return ', '.join(nlist[:8])
 
 
-def parse_ingredient(d: dict) -> str:
+def parse_ingredient(d: dict, detailed=False) -> str:
     name = d.get('strIngredient').strip()
     if not name:
         return ""
     stype = (d.get('strType') or "").strip()
-    # description = (d.get("strDescription") or "").strip()
     s = name + '\n'
     if stype:
         s += 'Type : ' + stype  # + '\n'
-    # s += description
+    if detailed:
+        s += (d.get("strDescription") or "").strip()
     return s
 
 

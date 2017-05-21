@@ -39,37 +39,38 @@ def main():
                 if "#" not in chan:  # 채널 메세지가 아니라 쿼리(귓속말)
                     chan = sender
 
-                ss, chk = handle(msg)
-                if ss:
-                    for s in ss:
-                        if s:
-                            irc.send(chan, s)
-                elif not ss and chk:
-                    irc.send(chan, "._.")
+                handle(chan, msg)
 
 
-def handle(msg: str) -> tuple:
-    s = ""
-    chk = False
+def handle(chan: str, msg: str):
+    s = ''
     if msg[:2] == 'c?':
-        chk = True
-        name = msg.split('>')[1].strip()
+        name = msg.split('?')[1].strip()
         if name:
             if name == 'random':
-                s = random_cocktails().split('\n')
+                s = random_cocktails()
             else:
-                s =  find_cocktails(name)
+                s = find_cocktails(name)
+            if not s:
+                s = '._.'
     elif msg[:2] == 'i?':
-        chk = True
-        name = msg.split('>')[1].strip()
+        name = msg.split('?')[1].strip()
         if name:
             s = find_ingredient(name)
+            if not s:
+                s = '._.'
+    elif msg.startswith('id?'):
+        name = msg.split('?')[1].strip()
+        if name:
+            s = find_ingredient(name, True)
+            if not s:
+                s = '._.'
     if s:
         if '\n' in s:
-            return tuple(s.split('\n')), chk
+            for l in s.split('\n'):
+                irc.send(chan, l)
         else:
-            return (s, ), chk
-    return (), chk
+            irc.send(chan, l)
 
 
 if __name__ == '__main__':

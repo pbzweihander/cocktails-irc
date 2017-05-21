@@ -82,7 +82,7 @@ def handle(chan: str, msg: str):
             for l in s.split('\n'):
                 irc.send(chan, l)
         else:
-            irc.send(chan, l)
+            irc.send(chan, s)
 
 
 if __name__ == '__main__':

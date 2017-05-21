@@ -51,7 +51,7 @@ def main():
 def handle(msg: str) -> tuple:
     s = ""
     chk = False
-    if msg[:2] == 'c>':
+    if msg[:2] == 'c?':
         chk = True
         name = msg.split('>')[1].strip()
         if name:
@@ -59,7 +59,7 @@ def handle(msg: str) -> tuple:
                 s = random_cocktails().split('\n')
             else:
                 s =  find_cocktails(name)
-    elif msg[:2] == 'i>':
+    elif msg[:2] == 'i?':
         chk = True
         name = msg.split('>')[1].strip()
         if name:

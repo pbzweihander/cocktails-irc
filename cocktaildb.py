@@ -18,11 +18,13 @@ import requests
 import json
 
 
-def find_cocktails(name: str) -> str:
+def find_cocktails(name: str, search=False) -> str:
     dlist = get_drinklist(r"http://www.thecocktaildb.com/api/json/v1/1/search.php?s=" + name)
     if len(dlist) == 0:
         return ""
-    if dlist[0].get('strDrink').strip().lower() == name.lower() or len(dlist) == 1:
+    if not dlist:
+        return ""
+    if (dlist[0].get('strDrink').strip().lower() == name.lower() or len(dlist) == 1) and not search:
         return parse_cocktail(dlist[0])
     else:
         nlist = [d.get('strDrink') for d in dlist]
@@ -70,13 +72,13 @@ def get_drinklist(url: str) -> list:
     return []
 
 
-def find_ingredient(name: str, detailed=False) -> str:
+def find_ingredient(name: str, search=False, detailed=False) -> str:
     dlist = get_ingredientlist(r"http://www.thecocktaildb.com/api/json/v1/1/search.php?i=" + name)
     if len(dlist) == 0:
         return ""
     if not dlist:
         return ""
-    if dlist[0].get('strIngredient').strip().lower() == name.lower() or len(dlist) == 1:
+    if (dlist[0].get('strIngredient').strip().lower() == name.lower() or len(dlist) == 1) and not search:
         return parse_ingredient(dlist[0], detailed)
     else:
         nlist = [d.get('strIngredient') for d in dlist]

@@ -44,7 +44,7 @@ def main():
 
 def handle(chan: str, msg: str):
     s = ''
-    if msg[:2] == 'c?':
+    if msg.startswith('c?'):
         name = msg.split('?')[1].strip()
         if name:
             if name == 'random':
@@ -53,16 +53,28 @@ def handle(chan: str, msg: str):
                 s = find_cocktails(name)
             if not s:
                 s = '._.'
-    elif msg[:2] == 'i?':
+    elif msg.startswith('cs?'):
+        name = msg.split('?')[1].strip()
+        if name:
+            s = find_cocktails(name, True)
+            if not s:
+                s = '._.'
+    elif msg.startswith('i?'):
         name = msg.split('?')[1].strip()
         if name:
             s = find_ingredient(name)
             if not s:
                 s = '._.'
+    elif msg.startswith('is?'):
+        name = msg.split('?')[1].strip()
+        if name:
+            s = find_ingredient(name, True, False)
+            if not s:
+                s = '._.'
     elif msg.startswith('id?'):
         name = msg.split('?')[1].strip()
         if name:
-            s = find_ingredient(name, True)
+            s = find_ingredient(name, False, True)
             if not s:
                 s = '._.'
     if s:

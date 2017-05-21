@@ -67,7 +67,7 @@ class IRC:
 
     def deop(self, chan, users):
         if len(users) > 4:
-            uarr = chunk(users, 4)
+            uarr = chunks(users, 4)
             for arr in uarr:
                 self.raw_send("MODE " + chan + " -" + ('o' * len(arr)) + " " + " ".join(arr))
         else:

@@ -56,7 +56,13 @@ def handle(chan: str, msg: str):
     elif msg.startswith('cs?'):
         name = msg.split('?')[1].strip()
         if name:
-            s = find_cocktails(name, True)
+            s = find_cocktails(name, True, False)
+            if not s:
+                s = '._.'
+    elif msg.startswith('cd?'):
+        name = msg.split('?')[1].strip()
+        if name:
+            s = find_cocktails(name, False, True)
             if not s:
                 s = '._.'
     elif msg.startswith('i?'):

@@ -18,14 +18,14 @@ import requests
 import json
 
 
-def find_cocktails(name: str, search=False) -> str:
+def find_cocktails(name: str, search=False, detailed=False) -> str:
     dlist = get_drinklist(r"http://www.thecocktaildb.com/api/json/v1/1/search.php?s=" + name)
     if len(dlist) == 0:
         return ""
     if not dlist:
         return ""
     if (dlist[0].get('strDrink').strip().lower() == name.lower() or len(dlist) == 1) and not search:
-        return parse_cocktail(dlist[0])
+        return parse_cocktail(dlist[0], detailed)
     else:
         nlist = [d.get('strDrink') for d in dlist]
         if len(nlist) < 8:
@@ -40,7 +40,7 @@ def random_cocktails() -> str:
     return parse_cocktail(d)
 
 
-def parse_cocktail(d: dict) -> str:
+def parse_cocktail(d: dict, detailed=False) -> str:
     name = d.get('strDrink').strip()
     if not name:
         return ""
@@ -53,13 +53,13 @@ def parse_cocktail(d: dict) -> str:
         if len(ii) > 0 and len(mm) > 0:
             ingredients.append(ii)
             measures.append(mm)
-    instruction = (d.get("strInstructions") or "").strip()
     s = name + '\n'
     if glass:
         s += glass + '\n'
     for i, m in zip(ingredients, measures):
         s += i + ' - ' + m + '\n'
-    s += instruction
+    if detailed:
+        s += (d.get("strInstructions") or "").strip()
     return s
 
 

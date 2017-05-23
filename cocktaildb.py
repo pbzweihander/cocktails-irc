@@ -24,8 +24,10 @@ def find_cocktails(name: str, search=False, detailed=False) -> str:
         return ""
     if not dlist:
         return ""
-    if (dlist[0].get('strDrink').strip().lower() == name.lower() or len(dlist) == 1) and not search:
-        return parse_cocktail(dlist[0], detailed)
+    if (name.lower() in [d.get('strDrink').lower() for d in dlist] or len(dlist) == 1) and not search:
+        for d in dlist:
+            if d.get('strDrink').lower() == name.lower():
+                return parse_cocktail(d, detailed)
     else:
         nlist = [d.get('strDrink') for d in dlist]
         if len(nlist) < 8:
@@ -50,14 +52,17 @@ def parse_cocktail(d: dict, detailed=False) -> str:
     for i in range(1, 16):
         ii = (d.get("strIngredient%s" % i) or "").strip()
         mm = (d.get("strMeasure%s" % i) or "").strip()
-        if len(ii) > 0 and len(mm) > 0:
+        if len(ii) > 0:
             ingredients.append(ii)
             measures.append(mm)
     s = name + '\n'
     if glass:
         s += glass + '\n'
     for i, m in zip(ingredients, measures):
-        s += i + ' - ' + m + '\n'
+        if measures:
+            s += i + ' - ' + m + '\n'
+        else:
+            s += i + '\n'
     if detailed:
         s += (d.get("strInstructions") or "").strip()
     return s
@@ -78,8 +83,10 @@ def find_ingredient(name: str, search=False, detailed=False) -> str:
         return ""
     if not dlist:
         return ""
-    if (dlist[0].get('strIngredient').strip().lower() == name.lower() or len(dlist) == 1) and not search:
-        return parse_ingredient(dlist[0], detailed)
+    if (name.lower() in [d.get('strIngredient').lower() for d in dlist] or len(dlist) == 1) and not search:
+        for d in dlist:
+            if name.lower() == d.get('strIngredient').lower():
+                return parse_ingredient(d, detailed)
     else:
         nlist = [d.get('strIngredient') for d in dlist]
         if len(nlist) < 8:

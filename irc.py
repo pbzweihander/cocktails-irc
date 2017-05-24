@@ -35,7 +35,6 @@ class IRC:
 
     def raw_send(self, msg):
         self.irc.send(bytes(msg + "\r\n", "UTF-8"))
-        print("[t] " + msg)
 
     def connect(self, server, port: int, channel, botnick):
         self.irc.connect((server, port))
